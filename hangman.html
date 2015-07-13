@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hangman!</title>
+<link rel = "shortcut icon" href = "http://www.plentyoftwenties.com/wp-content/uploads/2015/03/HangmanIcon_300x3004.png"
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script>
+var words = ['acres',
+'adult',
+'advice',
+'arrangement',
+'attempt',
+'august',
+'autumn',
+'border',
+'breeze',
+'brick',
+'calm',
+'canal',
+'casey',
+'cast',
+'chose',
+'claws',
+'coach',
+'constantly',
+'contrast',
+'cookies',
+'customs',
+'damage',
+'danny',
+'deeply',
+'depth',
+'discussion',
+'doll',
+'donkey',
+'egypt',
+'ellen',
+'essential',
+'exchange',
+'exist',
+'explanation',
+'facing',
+'film',
+'finest',
+'fireplace',
+'floating',
+'folks',
+'fort',
+'garage',
+'grabbed',
+'grandmother',
+'habit',
+'happily',
+'harry',
+'heading',
+'hunter',
+'illinois',
+'image',
+'independent',
+'instant',
+'january',
+'kids',
+'label',
+'lee',
+'lungs',
+'manufacturing',
+'martin',
+'mathematics',
+'melted',
+'memory',
+'mill',
+'mission',
+'monkey',
+'mount',
+'mysterious',
+'neighborhood',
+'norway',
+'nuts',
+'occasionally',
+'official',
+'ourselves',
+'palace',
+'pennsylvania',
+'philadelphia',
+'plates',
+'poetry',
+'policeman',
+'positive',
+'possibly',
+'practical',
+'pride',
+'promised',
+'recall',
+'relationship',
+'remarkable',
+'require',
+'rhyme',
+'rocky',
+'rubbed',
+'rush',
+'sale',
+'satellites',
+'satisfied',
+'scared',
+'selection',
+'shake',
+'shaking',
+'shallow',
+'shout',
+'silly',
+'simplest',
+'slight',
+'slip',
+'slope',
+'soap',
+'solar',
+'species',
+'spin',
+'stiff',
+'swung',
+'tales',
+'thumb',
+'tobacco',
+'toy',
+'trap',
+'treated',
+'tune',
+'university',
+'vapor',
+'vessels',
+'wealth',
+'wolf',
+'zoo'];
+var word = words[Math.round(Math.random()*(words.length - 1),0)];
+var guessed = Array();
+var alphabet = 'qwertyuiopasdfghjklzxcvbnm';
+var word_shown = Array(word.length + 1).join(" _");
+var num_wrong_guesses = 0;
+
+var guess = function(letter) {
+  guessed.push(letter);
+  word_shown = '';
+  num_wrong_guesses = 0;
+  for (i = 0; i < word.length; i++){
+    if (guessed.indexOf(word[i]) > -1) {
+      word_shown += " " + word[i];
+    } else {
+      word_shown += " _";
+    };
+  };
+  for (i = 0; i < guessed.length; i ++) {
+    if (word.indexOf(guessed[i]) === -1) {
+      num_wrong_guesses += 1;
+    };
+  };
+  $("#word_shown").text(word_shown);
+  $("#guessed").text("Guessed: " + guessed.join(", "));
+  $("#guesses_left").text("Guesses left: " + String(6 - num_wrong_guesses));
+  update_image(num_wrong_guesses);
+
+  if (6 - num_wrong_guesses < 1) {
+    $("#word_shown").text(word);
+    $("#word_shown").append(" YOU LOSE!!!");
+    $("#word_shown").css("color","red");
+  } else if (word_shown.indexOf("_") === -1) {
+    $("#word_shown").append(" YOU WIN!!!");
+    $("#word_shown").css("color","blue");
+  }
+};
+
+var update_image = function(num_wrong_guesses) {
+  var corpse = "O/|\\/\\";
+  corpse = corpse.substr(0,num_wrong_guesses);
+  var hangman_text = "<p>" + corpse[0] + "<br>" + corpse.substr(1,3) +"<br>" +
+    corpse.substr(4,7) + "<p>";
+  if (num_wrong_guesses != 0){
+    $("#hangman").html(hangman_text);
+  };
+};
+
+
+$(document).ready(function(){
+  for (i = 0; i < alphabet.length; i++) {
+   $("#buttons").append("<button class = 'btn btn-default' onclick = 'guess(\""
+   + alphabet[i] + "\")'>" + alphabet[i] + "</button>");
+   if (alphabet[i] === 'p') {
+     $("#buttons").append("<br/>" + Array(4).join("&nbsp"));
+   };
+   if (alphabet[i] === 'l') {
+     $("#buttons").append("<br/>" + Array(8).join("&nbsp"));
+   };
+  };
+
+  $("#word_shown").text(word_shown);
+
+  $("button").click(function(){
+   $(this).addClass("disabled");
+   $(this).css("background", "LightGray");
+  });
+
+  $("#restart").click(function(){
+   location.reload()
+  });
+});
+</script>
+</head>
+<body>
+<div class = "container">
+  <div class = "jumbotron">
+    <h1> Hangman! </h1>
+    <h3> Created this to help me get used to javascript &amp JQuery </h3>
+  </div>
+</div>
+<div class = "container">
+  <div class = "row">
+    <div class = "col-sm-5">
+      <div class = "panel panel-default">
+        <div class = "panel-body">
+          <p id = "word_shown" class = "text-center"></p>
+        </div>
+      </div>
+      <div id = "buttons"></div>
+      <div class = "panel panel-default">
+        <div class = "panel-body">
+          <p id = "guessed">Guessed: </p>
+          <p id = "guesses_left">Guesses left: 6</p>
+          <p id = "hangman"><br><br><br></p>
+        </div>
+      </div>
+      <button class = "btn btn-default" id = "restart">Restart</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
