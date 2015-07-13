@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
@@ -9,6 +9,18 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+    $(document).ready(function(){
+      $('img').hover(
+        function(){
+          $(this).attr("src", "http:\/\/imgs.xkcd.com\/comics\/the_general_problem.png");
+        },
+        function(){
+          $(this).attr("src", "http:\/\/imgs.xkcd.com\/comics\/automation.png");
+        });
+    });
+    </script>
   </head>
   <body>
     <section class="page-header">
@@ -22,12 +34,14 @@
             <h3><a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to my GitHub Page.</h3>
             <p>Most of the repos you'll find here were projects for the 10-part <a href="https://www.coursera.org/specialization/jhudatascience/1">Data Science Specialization</a> through Coursera and Johns Hopkins University.</p>
             <p>It was a fantastic set of courses that I'd highly recommend. Most of the repos here won't make much sense out of context, so visit coursera directly instead.</p>
+            <img class ="img-responsive" src="http:\/\/imgs.xkcd.com\/comics\/automation.png"></img>
           </div>
           <div class = "col-sm-4">
             <h3>Moon Lander with Bombs</h3>
             <p>Last year I was on a pygame kick and decided to create a little <a href="https://github.com/kevinandrewbishop/lander_space_invader"> Moon Lander game</a>. The moon has a randomly generated jagged surface and you can only land properly in areas that are flat enough. You've also got to land pretty softly or you'll crash.</p>
             <p>Honestly it was pretty boring. So I decided to add moon bases with missile silos that fire at the lander. I also equipped the lander with bombs. The task now is to destroy as many silos as possible and land safely before running out of fuel. Much more fun!</p>
             <p>This is written in python, not javascript, so you can't play in your browser. But if you've got python and pygame, just fork the repo and have fun!</p>
+<p>Once you're finished with that, if you're really depserate try this <a href = "hangman.html">Hangman</a> game that I made to help me learn javascript/jquery.</p> 
 
           </div>
           <div class = "col-sm-4">
