@@ -26,7 +26,6 @@ var words = ['acres',
 'brick',
 'calm',
 'canal',
-'casey',
 'cast',
 'chose',
 'claws',
@@ -36,14 +35,11 @@ var words = ['acres',
 'cookies',
 'customs',
 'damage',
-'danny',
 'deeply',
 'depth',
 'discussion',
 'doll',
 'donkey',
-'egypt',
-'ellen',
 'essential',
 'exchange',
 'exist',
@@ -60,20 +56,16 @@ var words = ['acres',
 'grandmother',
 'habit',
 'happily',
-'harry',
 'heading',
 'hunter',
 'illinois',
 'image',
 'independent',
 'instant',
-'january',
 'kids',
 'label',
-'lee',
 'lungs',
 'manufacturing',
-'martin',
 'mathematics',
 'melted',
 'memory',
@@ -83,14 +75,11 @@ var words = ['acres',
 'mount',
 'mysterious',
 'neighborhood',
-'norway',
 'nuts',
 'occasionally',
 'official',
 'ourselves',
 'palace',
-'pennsylvania',
-'philadelphia',
 'plates',
 'poetry',
 'policeman',
@@ -169,10 +158,10 @@ var guess = function(letter) {
 
   if (6 - num_wrong_guesses < 1) {
     $("#word_shown").text(word);
-    $("#word_shown").append(" YOU LOSE!!!");
+    $("#word_shown").append("<br> YOU LOSE!!!");
     $("#word_shown").css("color","red");
   } else if (word_shown.indexOf("_") === -1) {
-    $("#word_shown").append(" YOU WIN!!!");
+    $("#word_shown").append("<br> YOU WIN!!!");
     $("#word_shown").css("color","blue");
   }
 };
@@ -228,7 +217,6 @@ $(document).ready(function(){
           <p id = "word_shown" class = "text-center"></p>
         </div>
       </div>
-      <div id = "buttons"></div>
       <div class = "panel panel-default">
         <div class = "panel-body">
           <p id = "guessed">Guessed: </p>
@@ -236,6 +224,8 @@ $(document).ready(function(){
           <p id = "hangman"><br><br><br></p>
         </div>
       </div>
+      <div id = "buttons"></div>
+      <br>
       <button class = "btn btn-default" id = "restart">Restart</button>
     </div>
   </div>
