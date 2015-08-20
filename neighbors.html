@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Segregation</title>
+    <style>
+    canvas {
+      border: 1px solid black;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+    </script>
+  </head>
+  <body>
+    <canvas id="screen" width = "10" height = "10"></canvas>
+    <p>This simulation attempts to show how aggregate racial segregation can
+      result from minor racial preferences of individuals. It is based on
+      research from Thomas Schelling.</p>
+    <p>Click <a href="http://web.mit.edu/rajsingh/www/lab/alife/schelling.html">
+      here</a> for more info.<br>
+      Average Dispersion:
+    </p>
+    <p id = "dispersion">0</p>
+    <!--<p id = "happy (%)">0</p>-->
+    <a href="index.html">Back to my Github</a>
+
+    <script>
+    var height = window.innerHeight*.8;
+    var width = window.innerWidth*.8;
+//    $(document).ready(function(){
+
+
+      $("canvas").attr("width", width);
+      $("canvas").attr("height", height);
+
+      var canv = document.getElementById('screen');
+      var ctx = canv.getContext('2d');
+      ctx.fillStyle = "green";
+      ctx.fillRect(0,0, width, height);
+
+
+
+      function World(){
+        this.people = [];
+
+        this.add_person = function(person){this.people.push(person)};
+
+        this.get_distance = function(person1, person2){
+          var x_dist = Math.abs(person1.x - person2.x);
+          var y_dist = Math.abs(person1.y - person2.y);
+          var dist = Math.sqrt(Math.pow(x_dist, 2) + Math.pow(y_dist, 2));
+          return dist;
+        };
+
+        this.sort_function = function(a, b){
+          if (a[1] === b[1]){
+            return 0;
+          } else {
+            return (a[1] < b[1]) ? -1 : 1;
+          };
+        };
+
+        this.create_distance_matrix = function(){
+          var distance_matrix = {};
+          for (i = 0; i < this.people.length; i++){
+            distance_matrix[i] = {};
+            for (j = 0; j < this.people.length; j++){
+              if (i === j){continue};
+              distance_matrix[i][j] = [];
+            };
+          };
+          this.distance_matrix = distance_matrix;
+        };
+
+        this.update_distance_matrix = function(){
+          for (i = 0; i < this.people.length -1; i++){
+            for (j = i + 1; j < this.people.length; j++){
+              var distance = this.get_distance(this.people[i], this.people[j])
+              this.distance_matrix[i][j] = [distance, this.people[j].race];
+              this.distance_matrix[j][i] = [distance, this.people[i].race];
+            };
+          };
+        };
+
+        this.get_n_nearest = function(person){
+          var distances_and_races = [];
+          for (var i in this.people){
+            var person2 = this.people[i];
+            var temp = [person2.race];
+            temp.push(this.get_distance(person, person2));
+            distances_and_races.push(temp);
+          };
+          distances_and_races.sort(this.sort_function);
+          return distances_and_races;
+        };
+
+        this.run = function(){
+          for (i in this.people){
+            this.people[i].run();
+          };
+        };
+
+        this.get_dispersion = function(){
+          var dispersion = 0;
+          for (i in this.people){
+            dispersion += this.people[i].check_neighbors();
+          }
+          return dispersion;
+        };
+
+        this.check_state = function(){
+          var num_happy = 0;
+          for (i in this.people){
+            if (this.people[i].state == 'happy'){
+              num_happy += 1;
+            };
+          };
+          return num_happy/this.people.length;
+        };
+      };
+
+
+      function Person(x, y, race, pref_dict, num_neighbors, world){
+        this.x = x;
+        this.y = y;
+        this.race = race;
+        this.pref_dict = pref_dict;
+        this.num_neighbors = num_neighbors;
+        this.world = world;
+        this.vel = {
+          "x": Math.random()*4-2,
+          "y": 0,
+        };
+
+        this.move = function(){
+          this.check_wall();
+          this.x += this.vel.x;
+          this.y += this.vel.y;
+        };
+
+        this.get_vel = function(){
+          if (Math.random() < .01){
+            return {"x": 2*(Math.random()-.5), "y": 2*(Math.random()-.5)};
+          } else {
+            return this.vel;
+          };
+        };
+
+        this.check_wall = function(){
+          if (this.x > width | this.x < 0){
+            this.vel.x *= -1;
+          };
+          if (this.y > height | this.y < 0){
+            this.vel.y *= -1;
+          };
+        };
+
+        this.check_neighbors = function(){
+          var neighbors = this.world.get_n_nearest(this);
+          var num_same = 0;
+          /*for (i = 1; i < this.num_neighbors; i++){
+            if (neighbors[i][0] === this.race){
+              num_same += 1;
+            };
+          };*/ //OLD VERSION WHERE it's K nearest neighbors based, not distance based.
+          var min_num_neighbors = 10;
+          var total_count = 1;
+          for (i = 1; i < 1000; i++){
+            if (neighbors[i][1] > this.num_neighbors) {
+              break;
+               //if (i < min_num_neighbors) {return 1}; //"num_neighbors" is temporarily a max distance threshold
+            };
+            if (neighbors[i][0] === this.race){
+              num_same += 1;
+            };
+            total_count += 1;
+          };
+          return num_same/total_count;
+        };
+
+        this.get_state = function(){
+          var neighbor_ratio = this.check_neighbors();
+          if (neighbor_ratio < this.pref_dict[this.race]){
+            return "sad";
+          } else {
+            return "happy";
+          };
+        };
+
+        this.run = function(){
+          this.state = this.get_state();
+          this.vel = this.get_vel();
+          if (this.state === "sad"){
+            this.move();
+          };
+          this.render();
+        };
+
+        this.render = function(){
+          ctx.fillStyle = this.race;
+          ctx.fillRect(this.x, this.y, 5, 5);
+        }
+      };
+
+      var world = new World();
+      var people = [];
+      var race = "white";
+      var pref = {
+        "white": .3,
+        "black": .3,
+        "blue": .3
+      };
+      var num_neighbors = 60;
+      var num_people = 300;
+
+      for (i = 0; i < num_people; i ++){
+        if (i === num_people/3) {race = "black"};
+        if (i === 2*num_people/3) {race = "blue"};
+        var temp = new Person(Math.random()*width, Math.random()*height, race, pref, num_neighbors, world);
+        world.add_person(temp);
+      };
+
+      $("#dispersion").text(world.get_dispersion()/num_people);
+
+      var counter = 0;
+      setInterval(function(){
+        counter += 1;
+        if (counter === 100){
+          $("#dispersion").text(world.get_dispersion()/num_people);
+          $("#happy").text(world.check_state());
+          if (world.check_state() === 1){
+            clearInterval();
+          };
+          counter = 0;
+        };
+        ctx.fillStyle = "green";
+        ctx.fillRect(0,0, width, height);
+        world.run();
+        coord = [world.people[0].x, world.people[0].y]
+        ctx.beginPath();
+        ctx.arc(coord[0], coord[1], num_neighbors, 0, 2 * Math.PI, false);
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#003300';
+        ctx.stroke();
+      }, 1);
+
+    //});
+    </script>
+  </body>
+</html>
