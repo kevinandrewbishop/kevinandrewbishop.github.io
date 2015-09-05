@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Happy Birthday to Dave</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>
+  $(document).ready(function(){
+    var i = 0;
+    var j = 0;
+    var source_a = "https://scontent-ord1-1.xx.fbcdn.net/hphotos-xfp1/v/t1.0-9/1610034_10201636119651532_1532699878_n.jpg?oh=0b53920a926ac9ef41e7b6784569c0fd&oe=56AAA381"
+    var source_b = "https://scontent-ord1-1.xx.fbcdn.net/hphotos-xpf1/v/t1.0-9/197409_1004178391468_9047_n.jpg?oh=5ed42db0f180d189c90579f20746dd28&oe=56745126"
+    var source_c = "https://scontent-ord1-1.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/320467_2094686693494_92585292_n.jpg?oh=c68608eb9b00cbd62c2060d471a109f3&oe=567A0EDD"
+    setInterval(function(){
+      if (i === 5){
+        j += 1;
+        if (j < 4) {
+          $("#dave").attr("src", source_b);
+          $("h1").text("Happy Birthday to Dave! He has matured over the years!");
+        } else {
+          $("#dave").attr("src", source_c);
+          $("h1").text("Happy Birthday to Dave! He has matured over the years! Along with the rest of us!");
+        }
+
+        i = 0;
+      } else {
+        $("#dave").attr("src", source_a);
+        i += 1;
+      };
+
+    }, 550);
+  });
+  </script>
+</head>
+<body>
+  <h1>Happy Birthday to Dave!</h1>
+  <img id="dave" src="https://scontent-ord1-1.xx.fbcdn.net/hphotos-xfp1/v/t1.0-9/1610034_10201636119651532_1532699878_n.jpg?oh=0b53920a926ac9ef41e7b6784569c0fd&oe=56AAA381">
+
+</body>
+</html>
