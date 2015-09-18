@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Segregation</title>
+    <style>
+    canvas {
+      border: 1px solid black;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+    </script>
+  </head>
+  <body>
+    <canvas id="screen" width = "10" height = "10"></canvas>
+    <p>This simulation attempts to show how aggregate racial segregation can
+      result from minor racial preferences of individuals. It is based on
+      research from Thomas Schelling.</p>
+    <p>Click <a href="http://web.mit.edu/rajsingh/www/lab/alife/schelling.html">
+      here</a> for more info.<br>
+      Average Dispersion:
+    </p>
+    <p id = "dispersion">0</p>
+    <!--<p id = "happy (%)">0</p>-->
+    <a href="index.html">Back to my Github</a>
+
+    <script>
+    var height = window.innerHeight*.8;
+    var width = window.innerWidth*.8;
+//    $(document).ready(function(){
+
+
+      $("canvas").attr("width", width);
+      $("canvas").attr("height", height);
+
+      var canv = document.getElementById('screen');
+      var ctx = canv.getContext('2d');
+      ctx.fillStyle = "green";
+      ctx.fillRect(0,0, width, height);
+
+
+
+      function Universe(){
+        this.planets = [];
+
+        this.add_planet = function(planet){this.planets.push(planet)};
+
+        this.get_distance = function(planet1, planet2){
+          var x_dist = Math.abs(planet1.x - planet2.x);
+          var y_dist = Math.abs(planet1.y - planet2.y);
+          var dist = Math.sqrt(Math.pow(x_dist, 2) + Math.pow(y_dist, 2));
+          return dist;
+        };
+
+
+      };
+
+
+      function Planet(size, x, y, x_vel, y_vel, x_accel, y_accel){
+        this.size = size;
+        this.x = x;
+        this.y = y;
+        this.x_vel = x_vel;
+        this.y_vel = y_vel;
+        this.x_accel = x_accel;
+        this.y_accel = y_accel;
+
+        this.move = function(){
+          this.x += this.x_vel;
+          this.y += this.y_vel;
+          this.x_vel += this.x_accel;
+          this.y_vel += this.y_accel;
+        };
+
+        this.render = function(){
+          //#ctx.fillStyle = this.race;
+          ctx.fillStyle = "black";
+          ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
+          ctx.fill();
+        };
+      };
+
+      var world = new Universe();
+      var planet = new Planet(4, 10, 15, .05, .05, 0, 0);
+      setInterval(function(){
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "green";
+        ctx.fillRect(0, 0, width, height);
+        ctx.fill();
+        planet.move();
+        planet.render();
+        //world.run();
+
+      }, 1);
+
+    //});
+    </script>
+  </body>
+</html>
