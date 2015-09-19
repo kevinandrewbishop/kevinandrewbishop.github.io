@@ -20,19 +20,32 @@
     <script>
     var interval = null;
     $(document).ready(function(){
+
+      var colision_dampening = 1.01;
+
       $("#start").click(function(){
         start();
       });
+
       var start = function(){
+        var GRAVITY = $("#gravity").val()/100;
+        var num_planets = $("#num_planets").val();
+        var start_vel = $("#start_vel").val()/10;
+        if (GRAVITY === 0){GRAVITY = .02};
+        if (num_planets === ""){num_planets = 200};
+        if (start_vel === 0){start_vel = .9};
         clearInterval(interval);
         Math.seedrandom("spam");
         var planets = [];
         for (i = 0; i < num_planets; i ++) {
           planets.push(new Planet(Math.random()*18, Math.random()*width*.75 + width*.125, Math.random()*height*.75 + height*.125, Math.random()*start_vel - start_vel/2, Math.random()*start_vel - start_vel/2, 0, 0));
         };
-        var world = new Universe(planets);
+        var world = new Universe(planets, GRAVITY);
 
         interval = setInterval(function(){
+          var GRAVITY = $("#gravity").val()/100;
+          if (GRAVITY === 0){GRAVITY = .02};
+          world.gravity = GRAVITY;
           ctx.clearRect(0, 0, width, height);
           ctx.fillStyle = "black";
           ctx.fillRect(0, 0, width, height);
@@ -42,10 +55,8 @@
 
         }, 1);
       };
-      $(function() {
-        $( "#slider" ).slider();
-      });
 
+      start();
     });
     </script>
   </head>
@@ -54,8 +65,8 @@
     <a href="index.html">Back to my Github</a>
 
     <script>
-    var height = window.innerHeight*.8;
-    var width = window.innerWidth*.8;
+    var height = window.innerHeight*.9;
+    var width = window.innerWidth;
 
 //    $(document).ready(function(){
 
@@ -68,12 +79,9 @@
       ctx.fillStyle = "black";
       ctx.fillRect(0,0, width, height);
 
-      var mass_to_radius =  .1;
-
-
-
-      function Universe(planets){
+      function Universe(planets, gravity){
         this.planets = planets;
+        this.gravity = gravity;
 
         this.get_distance = function(planet1, planet2){
           var x_dist = Math.abs(planet1.x - planet2.x);
@@ -108,12 +116,12 @@
                 p1 = this.planets[i];
                 p2 = this.planets[j];
                 distance = this.get_distance(p1, p2);
-                if (distance < Math.sqrt(p1.mass) + Math.sqrt(p2.mass)){
+                if (distance < Math.sqrt(p1.mass/2) + Math.sqrt(p2.mass/2)){
                   this.merge_planets(i, j);
                 } else {
                   x_fraction = Math.abs(p1.x - p2.x)/(Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y));
                   y_fraction = 1 - x_fraction;
-                  force = GRAVITY*p1.mass*p2.mass/Math.pow(distance, 2);
+                  force = this.gravity*p1.mass*p2.mass/Math.pow(distance, 2);
                   p1.x_accel += Math.sign(p2.x - p1.x)*force*x_fraction/p1.mass;
                   p2.x_accel += Math.sign(p1.x - p2.x)*force*x_fraction/p2.mass;
                   p1.y_accel += Math.sign(p2.y - p1.y)*force*y_fraction/p1.mass;
@@ -164,19 +172,43 @@
         };
       };
 
-      var GRAVITY = .01;
-      var num_planets = 590;
-      var start_vel = .6;
       var colision_dampening = 1.01;
+
+
 
 
 
     //});
     </script>
     <br>
-    <button id="start">Restart</button>
+
     <div class="container">
-      <div id="slider"></div>
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label class="control-label col-sm-2" for="gravity">Gravity:</label>
+          <div class="col-sm-4">
+            <input type="number" class="form-control" id="gravity" placeholder="2">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2" for="num_planets">Number of Planets:</label>
+          <div class="col-sm-4">
+            <input type="number" class="form-control" id="num_planets" placeholder="200">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2" for="start_vel">Starting Velocity:</label>
+          <div class="col-sm-4">
+            <input type="number" class="form-control" id="start_vel" placeholder="9">
+          </div>
+        </div>
+      </form>
+      &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button id="start" class="btn btn-default">Restart</button>
+      <br>
+      <p>This simulates gravitational interactions between many bodies. When two bodies colide they "merge" in an oversimplified way to create a new, larger body.
+        Use the form to choose starting conditions like gravitational constant, number of planets, and initial velocity of the planets.
+        Note that <em>gravity can be changed mid-simulation</em>.
+      </p>
     </div>
   </body>
 </html>
