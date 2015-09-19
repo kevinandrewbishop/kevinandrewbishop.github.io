@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Segregation</title>
+    <title>Planets</title>
     <style>
     canvas {
       border: 1px solid black;
@@ -10,24 +10,53 @@
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script>
+    var interval = null;
+    $(document).ready(function(){
+      $("#start").click(function(){
+        start();
+      });
+      var start = function(){
+        clearInterval(interval);
+        Math.seedrandom("spam");
+        var planets = [];
+        for (i = 0; i < num_planets; i ++) {
+          planets.push(new Planet(Math.random()*18, Math.random()*width*.75 + width*.125, Math.random()*height*.75 + height*.125, Math.random()*start_vel - start_vel/2, Math.random()*start_vel - start_vel/2, 0, 0));
+        };
+        var world = new Universe(planets);
+
+        interval = setInterval(function(){
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = "black";
+          ctx.fillRect(0, 0, width, height);
+          ctx.fill();
+          world.run();
+          //world.run();
+
+        }, 1);
+      };
+      $(function() {
+        $( "#slider" ).slider();
+      });
+
+    });
+    </script>
   </head>
   <body>
     <canvas id="screen" width = "10" height = "10"></canvas>
-    <p>This simulation attempts to show how aggregate racial segregation can
-      result from minor racial preferences of individuals. It is based on
-      research from Thomas Schelling.</p>
-    <p>Click <a href="http://web.mit.edu/rajsingh/www/lab/alife/schelling.html">
-      here</a> for more info.<br>
-      Average Dispersion:
-    </p>
-    <p id = "dispersion">0</p>
-    <!--<p id = "happy (%)">0</p>-->
     <a href="index.html">Back to my Github</a>
 
     <script>
     var height = window.innerHeight*.8;
     var width = window.innerWidth*.8;
-    Math.seedrandom("random");
+
 //    $(document).ready(function(){
 
 
@@ -38,7 +67,7 @@
       var ctx = canv.getContext('2d');
       ctx.fillStyle = "black";
       ctx.fillRect(0,0, width, height);
-      var GRAVITY = .02;
+
       var mass_to_radius =  .1;
 
 
@@ -60,8 +89,8 @@
             p1 = this.planets[id2];
             p2 = this.planets[id1];
           };
-          p1.x_vel = (p1.x_vel*p1.mass + p2.x_vel*p2.mass)/(1.25*(p1.mass + p2.mass));
-          p1.y_vel = (p1.y_vel*p1.mass + p2.y_vel*p2.mass)/(1.25*(p1.mass + p2.mass));
+          p1.x_vel = (p1.x_vel*p1.mass + p2.x_vel*p2.mass)/(colision_dampening*(p1.mass + p2.mass));
+          p1.y_vel = (p1.y_vel*p1.mass + p2.y_vel*p2.mass)/(colision_dampening*(p1.mass + p2.mass));
           p1.mass += p2.mass;
           if (this.planets[id1].mass < this.planets[id2].mass){
             this.planets.splice(id1, 1);
@@ -79,7 +108,7 @@
                 p1 = this.planets[i];
                 p2 = this.planets[j];
                 distance = this.get_distance(p1, p2);
-                if (distance < p1.mass*mass_to_radius + p2.mass*mass_to_radius){
+                if (distance < Math.sqrt(p1.mass) + Math.sqrt(p2.mass)){
                   this.merge_planets(i, j);
                 } else {
                   x_fraction = Math.abs(p1.x - p2.x)/(Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y));
@@ -125,7 +154,7 @@
         this.render = function(){
           ctx.fillStyle = "gray";
           ctx.beginPath();
-          ctx.arc(this.x, this.y, this.mass*mass_to_radius, 0, 2*Math.PI);
+          ctx.arc(this.x, this.y, Math.sqrt(this.mass), 0, 2*Math.PI);
           ctx.fill();
         };
 
@@ -135,24 +164,19 @@
         };
       };
 
-      var num_planets = 80;
-      var planets = [];
-      for (i = 0; i < num_planets; i ++) {
-        planets.push(new Planet(Math.random()*18, Math.random()*width*.75 + width*.125, Math.random()*height*.75 + height*.125, Math.random()*.3 - .15, Math.random()*.3 - .15, 0, 0));
-      };
-      var world = new Universe(planets);
+      var GRAVITY = .01;
+      var num_planets = 590;
+      var start_vel = .6;
+      var colision_dampening = 1.01;
 
-      setInterval(function(){
-        ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, width, height);
-        ctx.fill();
-        world.run();
-        //world.run();
 
-      }, 1);
 
     //});
     </script>
+    <br>
+    <button id="start">Restart</button>
+    <div class="container">
+      <div id="slider"></div>
+    </div>
   </body>
 </html>
