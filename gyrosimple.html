@@ -1,0 +1,56 @@
+<DOCTYPE html>
+<html>
+  <head>
+    <style>
+    canvas {
+      border: 1px solid black;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+    </script>
+  </head>
+  <body>
+    <h1>Device Orientation Events</h1>
+    <p id="alpha">Alpha:</p>
+    <p id="beta">Beta:</p>
+    <p id="gamma">Gamma:</p>
+
+    <h1>Device Motion Events</h1>
+    <p id="accelerationx">Acceleration X:</p>
+    <p id="accelerationy">Acceleration Y:</p>
+    <p id="accelerationz">Acceleration Z:</p>
+    <p id="rotationRatex">Rotation Rate X:</p>
+    <p id="rotationRatey">Rotation Rate Y:</p>
+    <p id="rotationRatez">Rotation Rate Z:</p>
+    <p id="interval">Interval:</p>
+    <script>
+      if(window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', function(event) {
+                alpha = Math.round(event.alpha,1);
+                beta = Math.round(event.beta,1);
+                gamma = Math.round(event.gamma,1);
+                $("#alpha").text('Alpha: ' + alpha);
+                $("#beta").text('Beta: ' + beta);
+                $("#gamma").text('Gamma: ' + gamma);
+        });
+      };
+
+      if(window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', function(event) {
+                accelerationx = Math.round(event.acceleration.x,1);
+                accelerationy = Math.round(event.acceleration.y,1);
+                accelerationz = Math.round(event.acceleration.z,1);
+                rotationRatex = Math.round(event.rotationrate.x,1);
+                rotationRatey = Math.round(event.rotationrate.y,1);
+                rotationRatez = Math.round(event.rotationrate.z,1);
+                $("#accelerationx").text('Acceleration X: ' + accelerationx);
+                $("#accelerationy").text('Acceleration Y: ' + accelerationy);
+                $("#accelerationz").text('Acceleration Z: ' + accelerationz);
+                $("#rotationRatex").text('Rotation Rate X: ' + rotationRatex);
+                $("#rotationRatey").text('Rotation Rate Y: ' + rotationRateY);
+                $("#rotationRatez").text('Rotation Rate Z: ' + rotationRateZ);
+        });
+      };
+    </script>
+  </body>
+</html>
