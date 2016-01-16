@@ -1,0 +1,124 @@
+<DOCTYPE html>
+<html>
+  <head>
+    <style>
+    canvas {
+      border: 1px solid black;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+    </script>
+    <script>
+    function init() {
+      //Check for support for DeviceOrientation event
+      if(window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', function(event) {
+                var beta = Math.round(event.beta,1);
+                var gamma = Math.round(event.gamma,1);
+
+                if(beta!=null || gamma!=null)
+                  gravity_direction = beta;
+                  return gravity_direction;
+              }, false);
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <canvas id="screen" width = "10" height = "10"></canvas>
+    <p id = "alpha">0</p>
+    <p id = "beta">0</p>
+    <p id = "gamma">0</p>
+
+    <script>
+    var height = window.innerHeight*.8;
+    var width = window.innerWidth*.8;
+  //    $(document).ready(function(){
+
+
+      $("canvas").attr("width", width);
+      $("canvas").attr("height", height);
+
+      var canv = document.getElementById('screen');
+      var ctx = canv.getContext('2d');
+      ctx.fillStyle = "green";
+      ctx.fillRect(0,0, width, height);
+
+      var beta = 1;
+      console.log(beta);
+
+
+
+      function Ball(){
+        this.x = Math.random()*width;
+        this.y = Math.random()*height;
+
+        this.x_vel = 0;
+        this.y_vel = 0;
+
+        this.x_accel = 0;
+        this.y_accel = 0;
+
+        this.move = function(){
+          this.x_vel += this.x_accel;
+          this.y_vel += this.y_accel;
+          this.x += this.x_vel;
+          this.y += this.y_vel;
+          this.bounce();
+        }
+
+        this.bounce = function(){
+          if (this.x <0 || this.x > width){
+            this.x_vel *= -1;
+          };
+
+          if (this.y <0 || this.y > height){
+            this.y_vel *= -1;
+          };
+        };
+
+        this.render = function(){
+          ctx.fillStyle = "black";
+          ctx.fillRect(this.x, this.y, 5, 5);
+        }
+
+        this.get_beta = function(){
+          if(window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', function(event) {
+                    alpha = Math.round(event.alpha,1);
+                    beta = Math.round(event.beta,1);
+                    gamma = Math.round(event.gamma,1);
+
+            });
+          }
+        }
+
+        this.get_gravity = function(){
+          this.get_beta();
+          $('#alpha').text('alpha: ' + alpha);
+          $('#beta').text('beta: ' + beta);
+          $('#gamma').text('gamma: ' + gamma);
+          this.x = width*(1-(gamma + 180)/360);
+          this.y = height*(1-(beta + 90)/180);
+        }
+      };
+
+      var ball = new Ball();
+      ball.get_beta();
+      ball.render();
+
+      var counter = 0;
+      setInterval(function(){
+        ball.get_gravity();
+        ctx.fillStyle = "green";
+        ctx.fillRect(0,0, width, height);
+        //ball.move();
+        ball.render();
+      }, 1);
+
+
+
+    //});
+    </script>
+  </body>
+</html>
