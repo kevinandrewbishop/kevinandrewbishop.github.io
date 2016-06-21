@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>AI GAME</title>
+    <style>
+    canvas {
+      border: 1px solid black;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.0/seedrandom.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script>
+    var interval = null;
+    $(document).ready(function(){
+
+
+      $(document).keydown(function(e) {
+          if (e.keyCode == 37) keys['LEFT'] = true;
+          if (e.keyCode == 38) keys['UP'] = true;
+          if (e.keyCode == 39) keys['RIGHT'] = true;
+          if (e.keyCode == 40) keys['DOWN'] = true;
+          if (e.keyCode == 32) keys['SPACE'] = true;
+      });
+
+      $(document).keyup(function(e) {
+        if (e.keyCode == 37) keys['LEFT'] = false;
+        if (e.keyCode == 38) keys['UP'] = false;
+        if (e.keyCode == 39) keys['RIGHT'] = false;
+        if (e.keyCode == 40) keys['DOWN'] = false;
+        if (e.keyCode == 32) keys['SPACE'] = false;
+      });
+
+      var player = new Player();
+      var world = new World(player);
+
+      mainloop = function(){
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "green";
+        ctx.fillRect(0, 0, width, height);
+        ctx.fill();
+        world.render();
+        world.update();
+
+      };
+
+      interval = setInterval(mainloop, 10);
+
+    });
+    </script>
+  </head>
+  <body>
+    <canvas id="screen" width = "10" height = "10"></canvas>
+    <a href="index.html">Back to my Github</a>
+
+    <script>
+    var height = window.innerHeight*.9;
+    var width = window.innerWidth;
+
+
+      $("canvas").attr("width", width);
+      $("canvas").attr("height", height);
+
+      var canv = document.getElementById('screen');
+      var ctx = canv.getContext('2d');
+      ctx.fillStyle = "green";
+      ctx.fillRect(0,0, width, height);
+
+      var keys = {
+        'LEFT': false,
+        'RIGHT': false,
+        'UP': false,
+        'DOWN': false,
+        'SPACE': false
+      };
+
+
+      function World(player){
+        this.player = player;
+        this.player.world = this;
+        this.npcs = [new Laser(player)];
+
+        this.add_entity = function(entity) {
+          this.npcs.push(entity);
+          console.log("Added entity!");
+          console.log(entity);
+          console.log(this.npcs.length);
+          entity.update();
+          entity.render();
+        };
+
+        this.remove_entity = function(entity){
+          index = this.npcs.indexOf(entity);
+          this.npcs.splice(index, 1);
+        };
+
+        this.render = function(){
+          this.player.render();
+          for (i = 0; i < this.npcs.length; i ++){
+            entity = this.npcs[i];
+            entity.render();
+          };
+        };
+
+        this.update = function(){
+          this.player.update();
+          for (i = 0; i < this.npcs.length; i ++){
+            entity = this.npcs[i];
+            entity.update();
+          }
+        };
+      }
+
+      function Player(){
+        this.x = width*.8;
+        this.y = height*.8;
+        this.facing = 'l';
+        this.world = '';
+        this.color = "gray";
+
+        this.render = function(){
+          ctx.fillStyle = "gray";
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, Math.sqrt(40), 0, 2*Math.PI);
+          ctx.fill();
+        };
+
+        this.move_left = function(){
+          this.x -= 1;
+          this.facing = 'l';
+        };
+        this.move_right = function(){
+          this.x += 1;
+          this.facing = 'r';
+        };
+        this.move_up = function(){
+          this.y -= 1;
+          this.facing = 'u';
+        };
+        this.move_down = function(){
+          this.y += 1;
+          this.facing = 'd';
+        };
+        this.fire = function(){
+          var laser = new Laser(this);
+          this.world.add_entity(laser);
+          this.color = "blue";
+          keys['SPACE'] = false;
+        };
+
+        this.update = function(){
+          if (keys['LEFT']) this.move_left();
+          if (keys['RIGHT']) this.move_right();
+          if (keys['UP']) this.move_up();
+          if (keys['DOWN']) this.move_down();
+          if (keys['SPACE']) this.fire();
+        }
+      };
+
+      function Laser(player){
+        this.player = player;
+        this.x = player.x;
+        this.y = player.y;
+        this.x_vel = 0;
+        this.y_vel = 0;
+
+        switch(this.player.facing){
+          case 'l':
+            this.x = this.player.x - 1;
+            this.x_vel = -2;
+            break;
+          case 'r':
+            this.x = this.player.x + 1;
+            this.x_vel = 2;
+            break;
+          case 'u':
+            this.y = this.player.y - 1;
+            this.y_vel = -2;
+            break;
+          case 'd':
+            this.y = this.player.y + 1;
+            this.y_vel = 2;
+        };
+
+        this.update = function(){
+          this.x += this.x_vel;
+          this.y += this.y_vel;
+          if (this.x < 0 || this.x > width || this.y < 0 || this.y > height){
+            this.player.world.remove_entity(this);
+          };
+        };
+
+        this.render = function(){
+          ctx.fillStyle = "blue";
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, Math.sqrt(5), 0, 2*Math.PI);
+          ctx.fill();
+        }
+
+      }
+
+    </script>
+    <br>
+    <h3>Use arrow keys to move. Space to fire.</h3>
+  </body>
+</html>
