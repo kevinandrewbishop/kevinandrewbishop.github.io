@@ -59,12 +59,14 @@
         this.x_accel = 0;
         this.y_accel = 0;
 
+        this.drag_coef = .01; //simulating friction on the surface
+
         this.move = function(){
-          this.x_vel += this.x_accel;
-          this.y_vel += this.y_accel;
+          this.x_vel = (this.x_vel + this.x_accel)*(1 - this.drag_coef);
+          this.y_vel = (this.y_vel + this.y_accel)*(1 - this.drag_coef);
           this.x += this.x_vel;
           this.y += this.y_vel;
-          this.bounce();
+          //this.bounce();
         }
 
         this.bounce = function(){
@@ -93,13 +95,13 @@
           }
         }
 
-        this.get_gravity = function(){
+        this.update = function(){
           this.get_beta();
           $('#alpha').text('alpha: ' + alpha);
           $('#beta').text('beta: ' + beta);
           $('#gamma').text('gamma: ' + gamma);
-          this.x = width*(1-(gamma + 180)/360);
-          this.y = height*(1-(beta + 90)/180);
+          this.x_accel = gamma/90;
+          this.y_accel = beta/180;
         }
       };
 
