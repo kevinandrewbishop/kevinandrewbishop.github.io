@@ -9,19 +9,42 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
     </script>
     <script>
-    function init() {
-      //Check for support for DeviceOrientation event
-      if(window.DeviceOrientationEvent) {
-        window.addEventListener('deviceorientation', function(event) {
-                var beta = Math.round(event.beta,1);
-                var gamma = Math.round(event.gamma,1);
+    $(document).ready(function(){
 
-                if(beta!=null || gamma!=null)
-                  gravity_direction = beta;
-                  return gravity_direction;
-              }, false);
+      var level = 1;
+      var ball = new Ball();
+      var blocks = [];
+      for (i = 0; i < level*5 + 10; i++){
+        blocks.push(new Block());
       }
-    }
+      goal = new Block("yellow", true);
+
+      var counter = 0;
+      var interval = setInterval(function(){
+        ball.update();
+        ctx.fillStyle = "green";
+        ctx.fillRect(0,0, width, height);
+        //ball.move();
+        ball.render();
+        collide = false;
+        for (i = 0; i < blocks.length; i++){
+          blocks[i].render();
+          collide = blocks[i].check_collision(ball.x, ball.y);
+          if (collide) ball.collide();
+        };
+        goal.render();
+        win = goal.check_collision(ball.x, ball.y);
+        if (win == true) {
+          level += 1;
+          ball = new Ball();
+          blocks = [];
+          for (i = 0; i < level*5 + 10; i++){
+            blocks.push(new Block());
+          }
+          goal = new Block("yellow", true);
+        }
+      }, 1);
+    });
     </script>
   </head>
   <body>
@@ -29,10 +52,11 @@
     <p id = "alpha">0</p>
     <p id = "beta">0</p>
     <p id = "gamma">0</p>
+    <p>This is new</p>
 
     <script>
-    var height = window.innerHeight*.8;
-    var width = window.innerWidth*.8;
+    var height = window.innerHeight*.95;
+    var width = window.innerWidth;
   //    $(document).ready(function(){
 
 
@@ -44,14 +68,28 @@
       ctx.fillStyle = "green";
       ctx.fillRect(0,0, width, height);
 
-      var beta = 1;
-      console.log(beta);
+      var alpha = 0;
+      var beta = 0;
+      var gamma = 0;
 
 
+      get_orientation = function() {
+        if(window.DeviceOrientationEvent) {
+          window.addEventListener('orientationchange', function(event){
+            alpha = Math.round(event.alpha,2);
+            beta = Math.round(event.beta,2);
+            gamma = Math.round(event.gamma,2);
+          });
+        } else {
+          console.log('Eh, screw it.');
+        }
+      };
 
       function Ball(){
-        this.x = Math.random()*width;
-        this.y = Math.random()*height;
+        this.color = "black";
+
+        this.x = .08*width;
+        this.y = .92*height;
 
         this.x_vel = 0;
         this.y_vel = 0;
@@ -80,47 +118,85 @@
         };
 
         this.render = function(){
-          ctx.fillStyle = "black";
+          ctx.fillStyle = this.color;
           ctx.fillRect(this.x, this.y, 5, 5);
         }
 
-        this.get_beta = function(){
-          if(window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', function(event) {
-                    alpha = Math.round(event.alpha,1);
-                    beta = Math.round(event.beta,1);
-                    gamma = Math.round(event.gamma,1);
-
-            });
-          }
+        this.collide = function(){
+          this.dead = true;
         }
 
+        this.get_beta = function(){
+          //This can't be the best way to do this.
+           if(window.DeviceOrientationEvent) {
+             window.addEventListener('deviceorientation', function(event) {
+                     alpha = Math.round(event.alpha,1);
+                     beta = Math.round(event.beta,1);
+                     gamma = Math.round(event.gamma,1);
+             });
+           }
+         }
+
         this.update = function(){
+          if (this.dead){
+            this.color = "rgb(50,50,50)";
+            return 0;
+          };
           this.get_beta();
           $('#alpha').text('alpha: ' + alpha);
           $('#beta').text('beta: ' + beta);
           $('#gamma').text('gamma: ' + gamma);
           this.x_accel = gamma/90;
-          this.y_accel = beta/180;
+          this.y_accel = beta/90;
+          this.move();
         }
       };
 
-      var ball = new Ball();
-      ball.get_beta();
-      ball.render();
+      function Block(color = "red", goal = false){
+        this.goal = goal;
 
-      var counter = 0;
-      setInterval(function(){
-        ball.get_gravity();
-        ctx.fillStyle = "green";
-        ctx.fillRect(0,0, width, height);
-        //ball.move();
-        ball.render();
-      }, 1);
+        this.initialize = function(){
+          this.x = Math.random()*width;
+          this.y = Math.random()*height*.8;
+          this.width = Math.random()*width*.15;
+          this.height = Math.random()*height*.15;
+        }
+
+        this.initialized = false;
+        while (this.initialized === false){
+          //repeatedly initialize the block until you're certain it didn't start out colliding with player
+          this.initialize();
+          if ((this.y + this.height < height*.9) || (this.x > width*.9)) {
+            if ((this.y > height*.15) || (this.x + this.width < width*.85)) {
+              this.initialized = true;
+            }
+          }
+        }
+
+        if (this.goal){
+          this.x = width*.85;
+          this.y = height*.05;
+          this.width = width*.1;
+          this.height = height*.1;
+        }
+
+        this.color = color;
+
+        this.render = function(){
+          ctx.fillStyle = this.color;
+          ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+
+        this.check_collision = function(x, y){
+          if (x < this.x) return false;
+          if (y < this.y) return false;
+          if (x > this.x + this.width) return false;
+          if (y > this.y + this.height) return false;
+          return true;
+        }
+      }
 
 
-
-    //});
     </script>
   </body>
 </html>
