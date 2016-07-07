@@ -32,6 +32,8 @@
           collide = blocks[i].check_collision(ball.x, ball.y);
           if (collide) {
             collide_counter += 1;
+            level = 1;
+            if (!ball.dead) $('#level').text('level: ' + level);
             ball.collide();
           }
           if (collide_counter >= 50){
