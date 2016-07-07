@@ -20,19 +20,31 @@
       goal = new Block("yellow", true);
 
       var counter = 0;
+      collide_counter = 0;
       var interval = setInterval(function(){
         ball.update();
         ctx.fillStyle = "green";
         ctx.fillRect(0,0, width, height);
         //ball.move();
-        ball.render();
         collide = false;
+
         for (i = 0; i < blocks.length; i++){
-          blocks[i].render();
           collide = blocks[i].check_collision(ball.x, ball.y);
-          if (collide) ball.collide();
+          if (collide) {
+            collide_counter += 1;
+            ball.collide();
+          }
+          if (collide_counter >= 50){
+            collide_counter = 0;
+            level = 1;
+            ball = new Ball();
+            blocks = [];
+            for (i = 0; i < level*10; i++){
+              blocks.push(new Block());
+            }
+            goal = new Block("yellow", true);
+          }
         };
-        goal.render();
         win = goal.check_collision(ball.x, ball.y);
         if (win == true) {
           level += 1;
@@ -44,6 +56,11 @@
           }
           goal = new Block("yellow", true);
         }
+        for (i = 0; i < blocks.length; i++){
+          blocks[i].render();
+        };
+        goal.render()
+        ball.render();
       }, 1);
     });
     </script>
@@ -122,6 +139,12 @@
         this.render = function(){
           ctx.fillStyle = this.color;
           ctx.fillRect(this.x, this.y, 5, 5);
+          if (this.dead){
+            ctx.font = "100px Arial";
+            ctx.fillStyle = "blue";
+            ctx.textAlign = "center";
+            ctx.fillText("YOU LOSE!", width*.5, height*.5);
+          }
         }
 
         this.collide = function(){
@@ -141,7 +164,7 @@
 
         this.update = function(){
           if (this.dead){
-            this.color = "rgb(50,50,50)";
+            this.color = "rgb(Math.random()*250,Math.random()*250,Math.random()*250)";
             return 0;
           };
           this.get_beta();
