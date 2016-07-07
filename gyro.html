@@ -14,7 +14,7 @@
       var level = 1;
       var ball = new Ball();
       var blocks = [];
-      for (i = 0; i < level*5 + 10; i++){
+      for (i = 0; i < level*10; i++){
         blocks.push(new Block());
       }
       goal = new Block("yellow", true);
@@ -36,9 +36,10 @@
         win = goal.check_collision(ball.x, ball.y);
         if (win == true) {
           level += 1;
+          $('#level').text('level: ' + level);
           ball = new Ball();
           blocks = [];
-          for (i = 0; i < level*5 + 10; i++){
+          for (i = 0; i < level*10; i++){
             blocks.push(new Block());
           }
           goal = new Block("yellow", true);
@@ -48,6 +49,7 @@
     </script>
   </head>
   <body>
+    <h1 id = "level" class="lead">Level: 1</h1>
     <canvas id="screen" width = "10" height = "10"></canvas>
     <p id = "alpha">0</p>
     <p id = "beta">0</p>
